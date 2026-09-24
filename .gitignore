@@ -1,0 +1,9 @@
+/.codex/
+
+/drafts/
+/paper/*.aux
+/paper/*.log
+/paper/*.bbl
+/paper/*.blg
+/paper/*.out
+/paper/*.synctex.gz
