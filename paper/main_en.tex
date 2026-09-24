@@ -1,0 +1,64 @@
+\documentclass{article}
+\PassOptionsToPackage{numbers,sort,compress}{natbib}
+\usepackage[main,final]{neurips_2025}
+\usepackage{fontspec}
+\usepackage[english]{babel}
+\setmainfont{cmunrm.otf}[BoldFont=cmunbx.otf,ItalicFont=cmunti.otf,BoldItalicFont=cmunbi.otf]
+\setsansfont{cmunss.otf}
+\setmonofont{cmuntt.otf}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\makeatletter
+\renewcommand{\@noticestring}{Research project.}
+\makeatother
+\renewenvironment{abstract}{\vskip 0.075in\centerline{\large\bfseries\abstractname}\vspace{0.5ex}\begin{quote}}{\par\end{quote}\vskip 1ex}
+\setlength{\emergencystretch}{2em}
+\title{Adaptive Conditional Diffusion Sampling with Observations Arriving During Generation}
+\author{}
+\begin{document}
+\maketitle
+\begin{abstract}
+This work investigates ways to adapt diffusion models for trajectory generation to settings where new context arrives during generation. In motion forecasting, additional observations can refine possible futures or substantially change their probabilities, but incorporating these data may require repeated computation that is not always feasible under limited time and computational budgets. I investigate how to update a trajectory being generated using new data, when previous computation can be reused, and how the update strategy affects forecast quality and computational cost. To this end, I will review existing approaches to diffusion forecasting, streaming generation, and conditional sampling, compare their assumptions and limitations, and identify strategies applicable to context changes within an unfinished generation process. The comparison will consider different observation arrival times, different degrees of influence on the forecast, and comparable computational budgets, assessing trajectory accuracy, diversity of possible outcomes, and the time required to produce an updated result. I will also examine probabilistic forecast quality, since a single generated trajectory being close to the observed motion does not necessarily mean that the model correctly represents uncertainty about the future. Based on the identified limitations, I will propose possible improvements and test the conditions under which they make more effective use of new observations. The investigation aims to establish the capabilities and limits of adapting diffusion sampling to changing context under limited computational resources.
+\end{abstract}
+\noindent\textbf{Keywords:} diffusion models; trajectory generation; probabilistic forecasting; conditional sampling; streaming observations; computational efficiency.
+
+\clearpage
+\section{Related Work}
+\subsection{Diffusion generation and trajectory forecasting}
+
+Diffusion models generate outputs through successive denoising. DDPM provides the basic discrete formulation \citep{p37}, while Score-SDE relates stochastic processes and differential equations in continuous time \citep{p38}. For my topic, an important feature is the intermediate state between initial noise and a completed trajectory. When new data arrive, the question is whether this state can support an updated forecast and what errors this introduces.
+
+In motion forecasting, MID conditions generation on trajectory history and interactions \citep{p09}. LED additionally learns an initialization that skips part of denoising \citep{p10}, while MotionDiffuser models joint multi-agent futures and supports guided sampling \citep{p11}. These studies provide a domain-specific basis for comparing forecast quality, diversity, and cost. DiffTraj also addresses trajectories but generates synthetic GPS data \citep{p12}. I therefore consider it a source of representation ideas rather than a direct analogue of forecast updating.
+
+Planning methods form a separate group. Diffuser and Decision Diffuser use conditional generation to construct behavior with specified goals and constraints \citep{p14}, \citep{p15}. Diffusion Policy generates action sequences from observations \citep{p17}; Diffusion Planner addresses autonomous driving \citep{p13}, and DiffPhyCon addresses physical-system control \citep{p18}. Their quality depends on the outcome of executed actions as well as agreement with the data distribution. AdaptDiffuser additionally changes the planner through fine-tuning on selected synthetic data \citep{p16}. I distinguish this model adaptation from updating a single unfinished forecast.
+
+\subsection{New observations and reuse of computation}
+
+The closest studies preserve part of generation across incoming observations. Streaming Diffusion Policy maintains an action buffer with different noise levels and refines it using new observations \citep{p01}. CL-DiffPhyCon similarly uses asynchronous denoising, incorporating feedback when generating subsequent controls \citep{p02}. They demonstrate that using new context before the full sequence is complete is already an established research direction. Diffusion Forcing provides a more general training mechanism for sequences with different noise levels per element \citep{p05}.
+
+RTI-DP uses a previously predicted sequence as the initial guess for the next computation \citep{p04}. Sequential Flow Matching transports the previous distribution to an updated one conditioned on observations \citep{p03}. Unlike reusing an individual trajectory, it learns a transition between distributions. Its authors identify error accumulation in recursive updates and discuss adaptive re-noising and resets as future directions. This directly connects to my topic but does not make the general idea novel.
+
+Latency can also be addressed at execution time. RTC aligns adjacent action chunks under asynchronous generation \citep{p06}. Reactive Diffusion Policy introduces a fast feedback loop \citep{p07}, while FA-RDP adapts inference frequency and sampling steps to action ambiguity \citep{p08}. These approaches demonstrate different mechanisms for responding to new data. I will therefore distinguish intermediate-sample updates, reuse of completed forecasts, and execution corrections: similar practical goals do not make these problems identical.
+
+\subsection{Conditional distributions from observations}
+
+Time-series studies provide useful foundations for analyzing updates. CSDI and SSSD impute missing values from available observations \citep{p19}, \citep{p23}. TimeGrad produces autoregressive forecasts \citep{p20}, while TimeDiff generates the future segment jointly with specialized conditioning mechanisms \citep{p21}. TSDiff introduces conditions at inference and considers refining existing forecasts \citep{p24}. These methods inform the choice of an experimental base, but observations arriving within denoising require a dedicated protocol.
+
+Score-based Data Assimilation separates the observation model from generator training and reconstructs trajectories from incomplete or noisy measurements \citep{p22}. DDRM and Diffusion Posterior Sampling play related roles in inverse problems \citep{p29}, \citep{p28}. However, measurement conditioning can rely on approximations, and linear observation assumptions do not cover every form of context. Classifier-Free Guidance controls condition adherence and diversity \citep{p40}; increasing adherence does not itself establish a correct probabilistic update.
+
+\subsection{Computational efficiency and re-noising}
+
+Reducing cost does not necessarily require context adaptation. DDIM, DPM-Solver, DPM-Solver++, and UniPC accelerate numerical sampling \citep{p30}, \citep{p31}, \citep{p32}, \citep{p33}. EDM organizes choices of parameterization, noise scheduling, and sampling \citep{p36}. Progressive Distillation and Consistency Models reduce sampling steps through changes in training \citep{p35}, \citep{p34}, while Flow Matching provides an adjacent approach to learning distribution transport \citep{p39}. These studies help separate the potential benefit of context updating from ordinary generator acceleration and account for additional training costs.
+
+Re-noising is also an existing tool. RePaint uses resampling for image reconstruction \citep{p27}, Restart studies adding noise followed by reverse integration \citep{p25}, and RePS extends restart-based sampling to inverse problems \citep{p26}. Their results motivate including such operations in comparisons but do not establish which correction is appropriate after a particular new observation in trajectory forecasting.
+
+\subsection{Research direction}
+
+The reviewed studies already offer streaming generation, forecast reuse, and accelerated sampling. I therefore do not frame the problem as creating the first method that incorporates new observations. I investigate how these strategies behave when context changes within unfinished trajectory generation and how their applicability depends on observation arrival time, the extent of forecast change, and the available budget. The comparison must consider accuracy, uncertainty preservation, and update latency. Based on identified limitations, I will propose possible improvements; the particular approach and its distinction from the closest methods will be determined through further analysis and experiments.
+
+\clearpage
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+\end{document}
