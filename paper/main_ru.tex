@@ -1,3 +1,832 @@
+% Embedded dependencies for the standalone Codex LaTeX editor.
+\begin{filecontents*}{neurips_2025.sty}
+% partial rewrite of the LaTeX2e package for submissions to the
+% Conference on Neural Information Processing Systems (NeurIPS):
+%
+% - uses more LaTeX conventions
+% - line numbers at submission time replaced with aligned numbers from
+%   lineno package
+% - \nipsfinalcopy replaced with [final] package option
+% - automatically loads times package for authors
+% - loads natbib automatically; this can be suppressed with the
+%   [nonatbib] package option
+% - adds foot line to first page identifying the conference
+% - adds preprint option for submission to e.g. arXiv
+% - conference acronym modified
+% - update foot line to display the track name
+%
+% Roman Garnett (garnett@wustl.edu) and the many authors of
+% nips15submit_e.sty, including MK and drstrip@sandia
+%
+% last revision: April 2025
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{neurips_2025}[2025/05/01 NeurIPS 2025 submission/camera-ready style file]
+
+% declare final option, which creates camera-ready copy
+\newif\if@neuripsfinal\@neuripsfinalfalse
+\DeclareOption{final}{
+  \@neuripsfinaltrue
+  \@anonymousfalse
+}
+
+% declare nonatbib option, which does not load natbib in case of
+% package clash (users can pass options to natbib via
+% \PassOptionsToPackage)
+\newif\if@natbib\@natbibtrue
+\DeclareOption{nonatbib}{
+  \@natbibfalse
+}
+
+% declare preprint option, which creates a preprint version ready for
+% upload to, e.g., arXiv
+\newif\if@preprint\@preprintfalse
+\DeclareOption{preprint}{
+  \@preprinttrue
+  \@anonymousfalse
+}
+
+% determine the track of the paper in camera-ready mode
+\newif\if@main\@maintrue
+\DeclareOption{main}{
+  \@maintrue
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear).}
+}
+\newif\if@position\@positionfalse
+\DeclareOption{position}{
+  \@positiontrue
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear) Position Paper Track.}
+}
+\newif\if@dandb\@dandbfalse
+\DeclareOption{dandb}{
+  \@dandbtrue
+  \@anonymousfalse
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear) Track on Datasets and Benchmarks.}
+}
+\newif\if@creativeai\@creativeaifalse
+\DeclareOption{creativeai}{
+  \@creativeaitrue
+  \@anonymousfalse
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear) Creative AI Track.}
+}
+
+% For anonymous or non-anonymous
+\newif\if@anonymous\@anonymoustrue
+
+% For workshop papers
+\newcommand{\@workshoptitle}{}
+\newcommand{\workshoptitle}[1]{\renewcommand{\@workshoptitle}{#1}}
+
+\newif\if@workshop\@workshopfalse
+\DeclareOption{sglblindworkshop}{
+  \@workshoptrue
+  \@anonymousfalse
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear) Workshop: \@workshoptitle.}
+}
+\DeclareOption{dblblindworkshop}{
+  \@workshoptrue
+  \newcommand{\@trackname}{\@neuripsordinal\ Conference on Neural Information Processing Systems (NeurIPS \@neuripsyear) Workshop: \@workshoptitle.}
+}
+
+\ProcessOptions\relax
+
+% fonts
+\renewcommand{\rmdefault}{ptm}
+\renewcommand{\sfdefault}{phv}
+
+% change this every year for notice string at bottom
+\newcommand{\@neuripsordinal}{39th}
+\newcommand{\@neuripsyear}{2025}
+\newcommand{\@neuripslocation}{San Diego}
+
+% acknowledgments
+\usepackage{environ}
+\newcommand{\acksection}{\section*{Acknowledgments and Disclosure of Funding}}
+\NewEnviron{ack}{%
+  \acksection
+  \BODY
+}
+
+
+% load natbib unless told otherwise
+\if@natbib
+  \RequirePackage{natbib}
+\fi
+
+% set page geometry
+\usepackage[verbose=true,letterpaper]{geometry}
+\AtBeginDocument{
+  \newgeometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+  }
+  \@ifpackageloaded{fullpage}
+    {\PackageWarning{neurips_2025}{fullpage package not allowed! Overwriting formatting.}}
+    {}
+}
+
+\widowpenalty=10000
+\clubpenalty=10000
+\flushbottom
+\sloppy
+
+
+% font sizes with reduced leading
+\renewcommand{\normalsize}{%
+  \@setfontsize\normalsize\@xpt\@xipt
+  \abovedisplayskip      7\p@ \@plus 2\p@ \@minus 5\p@
+  \abovedisplayshortskip \z@ \@plus 3\p@
+  \belowdisplayskip      \abovedisplayskip
+  \belowdisplayshortskip 4\p@ \@plus 3\p@ \@minus 3\p@
+}
+\normalsize
+\renewcommand{\small}{%
+  \@setfontsize\small\@ixpt\@xpt
+  \abovedisplayskip      6\p@ \@plus 1.5\p@ \@minus 4\p@
+  \abovedisplayshortskip \z@  \@plus 2\p@
+  \belowdisplayskip      \abovedisplayskip
+  \belowdisplayshortskip 3\p@ \@plus 2\p@   \@minus 2\p@
+}
+\renewcommand{\footnotesize}{\@setfontsize\footnotesize\@ixpt\@xpt}
+\renewcommand{\scriptsize}{\@setfontsize\scriptsize\@viipt\@viiipt}
+\renewcommand{\tiny}{\@setfontsize\tiny\@vipt\@viipt}
+\renewcommand{\large}{\@setfontsize\large\@xiipt{14}}
+\renewcommand{\Large}{\@setfontsize\Large\@xivpt{16}}
+\renewcommand{\LARGE}{\@setfontsize\LARGE\@xviipt{20}}
+\renewcommand{\huge}{\@setfontsize\huge\@xxpt{23}}
+\renewcommand{\Huge}{\@setfontsize\Huge\@xxvpt{28}}
+
+% sections with less space
+\providecommand{\section}{}
+\renewcommand{\section}{%
+  \@startsection{section}{1}{\z@}%
+                {-2.0ex \@plus -0.5ex \@minus -0.2ex}%
+                { 1.5ex \@plus  0.3ex \@minus  0.2ex}%
+                {\large\bf\raggedright}%
+}
+\providecommand{\subsection}{}
+\renewcommand{\subsection}{%
+  \@startsection{subsection}{2}{\z@}%
+                {-1.8ex \@plus -0.5ex \@minus -0.2ex}%
+                { 0.8ex \@plus  0.2ex}%
+                {\normalsize\bf\raggedright}%
+}
+\providecommand{\subsubsection}{}
+\renewcommand{\subsubsection}{%
+  \@startsection{subsubsection}{3}{\z@}%
+                {-1.5ex \@plus -0.5ex \@minus -0.2ex}%
+                { 0.5ex \@plus  0.2ex}%
+                {\normalsize\bf\raggedright}%
+}
+\providecommand{\paragraph}{}
+\renewcommand{\paragraph}{%
+  \@startsection{paragraph}{4}{\z@}%
+                {1.5ex \@plus 0.5ex \@minus 0.2ex}%
+                {-1em}%
+                {\normalsize\bf}%
+}
+\providecommand{\subparagraph}{}
+\renewcommand{\subparagraph}{%
+  \@startsection{subparagraph}{5}{\z@}%
+                {1.5ex \@plus 0.5ex \@minus 0.2ex}%
+                {-1em}%
+                {\normalsize\bf}%
+}
+\providecommand{\subsubsubsection}{}
+\renewcommand{\subsubsubsection}{%
+  \vskip5pt{\noindent\normalsize\rm\raggedright}%
+}
+
+% float placement
+\renewcommand{\topfraction      }{0.85}
+\renewcommand{\bottomfraction   }{0.4}
+\renewcommand{\textfraction     }{0.1}
+\renewcommand{\floatpagefraction}{0.7}
+
+\newlength{\@neuripsabovecaptionskip}\setlength{\@neuripsabovecaptionskip}{7\p@}
+\newlength{\@neuripsbelowcaptionskip}\setlength{\@neuripsbelowcaptionskip}{\z@}
+
+\setlength{\abovecaptionskip}{\@neuripsabovecaptionskip}
+\setlength{\belowcaptionskip}{\@neuripsbelowcaptionskip}
+
+% swap above/belowcaptionskip lengths for tables
+\renewenvironment{table}
+  {\setlength{\abovecaptionskip}{\@neuripsbelowcaptionskip}%
+   \setlength{\belowcaptionskip}{\@neuripsabovecaptionskip}%
+   \@float{table}}
+  {\end@float}
+
+% footnote formatting
+\setlength{\footnotesep }{6.65\p@}
+\setlength{\skip\footins}{9\p@ \@plus 4\p@ \@minus 2\p@}
+\renewcommand{\footnoterule}{\kern-3\p@ \hrule width 12pc \kern 2.6\p@}
+\setcounter{footnote}{0}
+
+% paragraph formatting
+\setlength{\parindent}{\z@}
+\setlength{\parskip  }{5.5\p@}
+
+% list formatting
+\setlength{\topsep       }{4\p@ \@plus 1\p@   \@minus 2\p@}
+\setlength{\partopsep    }{1\p@ \@plus 0.5\p@ \@minus 0.5\p@}
+\setlength{\itemsep      }{2\p@ \@plus 1\p@   \@minus 0.5\p@}
+\setlength{\parsep       }{2\p@ \@plus 1\p@   \@minus 0.5\p@}
+\setlength{\leftmargin   }{3pc}
+\setlength{\leftmargini  }{\leftmargin}
+\setlength{\leftmarginii }{2em}
+\setlength{\leftmarginiii}{1.5em}
+\setlength{\leftmarginiv }{1.0em}
+\setlength{\leftmarginv  }{0.5em}
+\def\@listi  {\leftmargin\leftmargini}
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep  2\p@ \@plus 1\p@    \@minus 0.5\p@
+              \parsep  1\p@ \@plus 0.5\p@ \@minus 0.5\p@
+              \itemsep \parsep}
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep    1\p@ \@plus 0.5\p@ \@minus 0.5\p@
+              \parsep    \z@
+              \partopsep 0.5\p@ \@plus 0\p@ \@minus 0.5\p@
+              \itemsep \topsep}
+\def\@listiv {\leftmargin\leftmarginiv
+              \labelwidth\leftmarginiv
+              \advance\labelwidth-\labelsep}
+\def\@listv  {\leftmargin\leftmarginv
+              \labelwidth\leftmarginv
+              \advance\labelwidth-\labelsep}
+\def\@listvi {\leftmargin\leftmarginvi
+              \labelwidth\leftmarginvi
+              \advance\labelwidth-\labelsep}
+
+% create title
+\providecommand{\maketitle}{}
+\renewcommand{\maketitle}{%
+  \par
+  \begingroup
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}}
+    % for perfect author name centering
+    \renewcommand{\@makefnmark}{\hbox to \z@{$^{\@thefnmark}$\hss}}
+    % The footnote-mark was overlapping the footnote-text,
+    % added the following to fix this problem               (MK)
+    \long\def\@makefntext##1{%
+      \parindent 1em\noindent
+      \hbox to 1.8em{\hss $\m@th ^{\@thefnmark}$}##1
+    }
+    \thispagestyle{empty}
+    \@maketitle
+    \@thanks
+    \@notice
+  \endgroup
+  \let\maketitle\relax
+  \let\thanks\relax
+}
+
+% rules for title box at top of first page
+\newcommand{\@toptitlebar}{
+  \hrule height 4\p@
+  \vskip 0.25in
+  \vskip -\parskip%
+}
+\newcommand{\@bottomtitlebar}{
+  \vskip 0.29in
+  \vskip -\parskip
+  \hrule height 1\p@
+  \vskip 0.09in%
+}
+
+% create title (includes both anonymized and non-anonymized versions)
+\providecommand{\@maketitle}{}
+\renewcommand{\@maketitle}{%
+  \vbox{%
+    \hsize\textwidth
+    \linewidth\hsize
+    \vskip 0.1in
+    \@toptitlebar
+    \centering
+    {\LARGE\bf \@title\par}
+    \@bottomtitlebar
+    \if@anonymous
+      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}
+        Anonymous Author(s) \\
+        Affiliation \\
+        Address \\
+        \texttt{email} \\
+      \end{tabular}%
+    \else
+      \def\And{%
+        \end{tabular}\hfil\linebreak[0]\hfil%
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+      }
+      \def\AND{%
+        \end{tabular}\hfil\linebreak[4]\hfil%
+        \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\ignorespaces%
+      }
+      \begin{tabular}[t]{c}\bf\rule{\z@}{24\p@}\@author\end{tabular}%
+    \fi
+    \vskip 0.3in \@minus 0.1in
+  }
+}
+
+% add conference notice to bottom of first page
+\newcommand{\ftype@noticebox}{8}
+\newcommand{\@notice}{%
+  % give a bit of extra room back to authors on first page
+  \enlargethispage{2\baselineskip}%
+  \@float{noticebox}[b]%
+    \footnotesize\@noticestring%
+  \end@float%
+}
+
+% abstract styling
+\renewenvironment{abstract}%
+{%
+  \vskip 0.075in%
+  \centerline%
+  {\large\bf Abstract}%
+  \vspace{0.5ex}%
+  \begin{quote}%
+}
+{
+  \par%
+  \end{quote}%
+  \vskip 1ex%
+}
+
+% For the paper checklist
+\newcommand{\answerYes}[1][]{\textcolor{blue}{[Yes] #1}}
+\newcommand{\answerNo}[1][]{\textcolor{orange}{[No] #1}}
+\newcommand{\answerNA}[1][]{\textcolor{gray}{[NA] #1}}
+\newcommand{\answerTODO}[1][]{\textcolor{red}{\bf [TODO]}}
+\newcommand{\justificationTODO}[1][]{\textcolor{red}{\bf [TODO]}}
+
+% handle tweaks for camera-ready copy vs. submission copy
+\if@preprint
+  \newcommand{\@noticestring}{%
+    Preprint.%
+  }
+\else
+  \if@neuripsfinal
+    \newcommand{\@noticestring}{
+      \@trackname
+    }
+  \else
+    \newcommand{\@noticestring}{%
+      Submitted to \@neuripsordinal\/ Conference on Neural Information
+      Processing Systems (NeurIPS \@neuripsyear). Do not distribute.%
+    }
+
+    % hide the acknowledgements
+    \NewEnviron{hide}{}
+    \let\ack\hide
+    \let\endack\endhide
+
+    % line numbers for submission
+    \RequirePackage{lineno}
+    \linenumbers
+
+    % fix incompatibilities between lineno and amsmath, if required, by
+    % transparently wrapping linenomath environments around amsmath
+    % environments
+    \AtBeginDocument{%
+      \@ifpackageloaded{amsmath}{%
+        \newcommand*\patchAmsMathEnvironmentForLineno[1]{%
+          \expandafter\let\csname old#1\expandafter\endcsname\csname #1\endcsname
+          \expandafter\let\csname oldend#1\expandafter\endcsname\csname end#1\endcsname
+          \renewenvironment{#1}%
+                          {\linenomath\csname old#1\endcsname}%
+                          {\csname oldend#1\endcsname\endlinenomath}%
+        }%
+        \newcommand*\patchBothAmsMathEnvironmentsForLineno[1]{%
+          \patchAmsMathEnvironmentForLineno{#1}%
+          \patchAmsMathEnvironmentForLineno{#1*}%
+        }%
+        \patchBothAmsMathEnvironmentsForLineno{equation}%
+        \patchBothAmsMathEnvironmentsForLineno{align}%
+        \patchBothAmsMathEnvironmentsForLineno{flalign}%
+        \patchBothAmsMathEnvironmentsForLineno{alignat}%
+        \patchBothAmsMathEnvironmentsForLineno{gather}%
+        \patchBothAmsMathEnvironmentsForLineno{multline}%
+      }
+      {}
+    }
+  \fi
+\fi
+
+
+\endinput
+
+
+\end{filecontents*}
+\begin{filecontents*}{references.bib}
+@misc{p01,
+  title = {{Streaming Diffusion Policy: Fast Policy Synthesis with Variable Noise Diffusion Models}},
+  author = {Høeg, Sigmund H. and Du, Yilun and Egeland, Olav},
+  year = {2024},
+  eprint = {2406.04806},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2406.04806},
+  url = {https://arxiv.org/abs/2406.04806}
+}
+
+@misc{p02,
+  title = {{CL-DiffPhyCon: Closed-loop Diffusion Control of Complex Physical Systems}},
+  author = {Wei, Long and Feng, Haodong and Yang, Yuchen and Feng, Ruiqi and Hu, Peiyan and Zheng, Xiang and Zhang, Tao and Fan, Dixia and Wu, Tailin},
+  year = {2024},
+  eprint = {2408.03124},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2408.03124},
+  url = {https://arxiv.org/abs/2408.03124}
+}
+
+@misc{p03,
+  title = {{Accelerated Sequential Flow Matching: A Bayesian Filtering Perspective}},
+  author = {Huang, Yinan and Hsu, Hans Hao-Hsun and Wang, Junran and Dai, Bo and Li, Pan},
+  year = {2026},
+  eprint = {2602.05319},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2602.05319},
+  url = {https://arxiv.org/abs/2602.05319}
+}
+
+@misc{p04,
+  title = {{Real-Time Iteration Scheme for Diffusion Policy}},
+  author = {Duan, Yufei and Yin, Hang and Kragic, Danica},
+  year = {2025},
+  eprint = {2508.05396},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2508.05396},
+  url = {https://arxiv.org/abs/2508.05396}
+}
+
+@misc{p05,
+  title = {{Diffusion Forcing: Next-token Prediction Meets Full-Sequence Diffusion}},
+  author = {Chen, Boyuan and Monso, Diego Marti and Du, Yilun and Simchowitz, Max and Tedrake, Russ and Sitzmann, Vincent},
+  year = {2024},
+  eprint = {2407.01392},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2407.01392},
+  url = {https://arxiv.org/abs/2407.01392}
+}
+
+@misc{p06,
+  title = {{Real-Time Execution of Action Chunking Flow Policies}},
+  author = {Black, Kevin and Galliker, Manuel Y. and Levine, Sergey},
+  year = {2025},
+  eprint = {2506.07339},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2506.07339},
+  url = {https://arxiv.org/abs/2506.07339}
+}
+
+@misc{p07,
+  title = {{Reactive Diffusion Policy: Slow-Fast Visual-Tactile Policy Learning for Contact-Rich Manipulation}},
+  author = {Xue, Han and Ren, Jieji and Chen, Wendi and Zhang, Gu and Fang, Yuan and Gu, Guoying and Xu, Huazhe and Lu, Cewu},
+  year = {2025},
+  eprint = {2503.02881},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2503.02881},
+  url = {https://arxiv.org/abs/2503.02881}
+}
+
+@misc{p08,
+  title = {{FA-RDP: A Frequency-Adaptive Reactive Diffusion Policy for Contact-Rich Manipulation}},
+  author = {Zhuo, Lifeng and Chen, Wendi and Xue, Han and Tang, Shirun and Lv, Jun and Lu, Cewu and Wen, Chuan},
+  year = {2026},
+  eprint = {2607.28596},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2607.28596},
+  url = {https://arxiv.org/abs/2607.28596}
+}
+
+@misc{p09,
+  title = {{Stochastic Trajectory Prediction via Motion Indeterminacy Diffusion}},
+  author = {Gu, Tianpei and Chen, Guangyi and Li, Junlong and Lin, Chunze and Rao, Yongming and Zhou, Jie and Lu, Jiwen},
+  year = {2022},
+  eprint = {2203.13777},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2203.13777},
+  url = {https://arxiv.org/abs/2203.13777}
+}
+
+@misc{p10,
+  title = {{Leapfrog Diffusion Model for Stochastic Trajectory Prediction}},
+  author = {Mao, Weibo and Xu, Chenxin and Zhu, Qi and Chen, Siheng and Wang, Yanfeng},
+  year = {2023},
+  eprint = {2303.10895},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2303.10895},
+  url = {https://arxiv.org/abs/2303.10895}
+}
+
+@misc{p11,
+  title = {{MotionDiffuser: Controllable Multi-Agent Motion Prediction using Diffusion}},
+  author = {Jiang, Chiyu Max and Cornman, Andre and Park, Cheolho and Sapp, Ben and Zhou, Yin and Anguelov, Dragomir},
+  year = {2023},
+  eprint = {2306.03083},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2306.03083},
+  url = {https://arxiv.org/abs/2306.03083}
+}
+
+@misc{p12,
+  title = {{DiffTraj: Generating GPS Trajectory with Diffusion Probabilistic Model}},
+  author = {Zhu, Yuanshao and Ye, Yongchao and Zhang, Shiyao and Zhao, Xiangyu and Yu, James J. Q.},
+  year = {2023},
+  eprint = {2304.11582},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2304.11582},
+  url = {https://arxiv.org/abs/2304.11582}
+}
+
+@misc{p13,
+  title = {{Diffusion-Based Planning for Autonomous Driving with Flexible Guidance}},
+  author = {Zheng, Yinan and Liang, Ruiming and Zheng, Kexin and Zheng, Jinliang and Mao, Liyuan and Li, Jianxiong and Gu, Weihao and Ai, Rui and Li, Shengbo Eben and Zhan, Xianyuan and Liu, Jingjing},
+  year = {2025},
+  eprint = {2501.15564},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2501.15564},
+  url = {https://arxiv.org/abs/2501.15564}
+}
+
+@misc{p14,
+  title = {{Planning with Diffusion for Flexible Behavior Synthesis}},
+  author = {Janner, Michael and Du, Yilun and Tenenbaum, Joshua B. and Levine, Sergey},
+  year = {2022},
+  eprint = {2205.09991},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2205.09991},
+  url = {https://arxiv.org/abs/2205.09991}
+}
+
+@misc{p15,
+  title = {{Is Conditional Generative Modeling all you need for Decision-Making?}},
+  author = {Ajay, Anurag and Du, Yilun and Gupta, Abhi and Tenenbaum, Joshua and Jaakkola, Tommi and Agrawal, Pulkit},
+  year = {2022},
+  eprint = {2211.15657},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2211.15657},
+  url = {https://arxiv.org/abs/2211.15657}
+}
+
+@misc{p16,
+  title = {{AdaptDiffuser: Diffusion Models as Adaptive Self-evolving Planners}},
+  author = {Liang, Zhixuan and Mu, Yao and Ding, Mingyu and Ni, Fei and Tomizuka, Masayoshi and Luo, Ping},
+  year = {2023},
+  eprint = {2302.01877},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2302.01877},
+  url = {https://arxiv.org/abs/2302.01877}
+}
+
+@misc{p17,
+  title = {{Diffusion Policy: Visuomotor Policy Learning via Action Diffusion}},
+  author = {Chi, Cheng and Xu, Zhenjia and Feng, Siyuan and Cousineau, Eric and Du, Yilun and Burchfiel, Benjamin and Tedrake, Russ and Song, Shuran},
+  year = {2023},
+  eprint = {2303.04137},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2303.04137},
+  url = {https://arxiv.org/abs/2303.04137}
+}
+
+@misc{p18,
+  title = {{DiffPhyCon: A Generative Approach to Control Complex Physical Systems}},
+  author = {Wei, Long and Hu, Peiyan and Feng, Ruiqi and Feng, Haodong and Du, Yixuan and Zhang, Tao and Wang, Rui and Wang, Yue and Ma, Zhi-Ming and Wu, Tailin},
+  year = {2024},
+  eprint = {2407.06494},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2407.06494},
+  url = {https://arxiv.org/abs/2407.06494}
+}
+
+@misc{p19,
+  title = {{CSDI: Conditional Score-based Diffusion Models for Probabilistic Time Series Imputation}},
+  author = {Tashiro, Yusuke and Song, Jiaming and Song, Yang and Ermon, Stefano},
+  year = {2021},
+  eprint = {2107.03502},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2107.03502},
+  url = {https://arxiv.org/abs/2107.03502}
+}
+
+@misc{p20,
+  title = {{Autoregressive Denoising Diffusion Models for Multivariate Probabilistic Time Series Forecasting}},
+  author = {Rasul, Kashif and Seward, Calvin and Schuster, Ingmar and Vollgraf, Roland},
+  year = {2021},
+  eprint = {2101.12072},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2101.12072},
+  url = {https://arxiv.org/abs/2101.12072}
+}
+
+@misc{p21,
+  title = {{Non-autoregressive Conditional Diffusion Models for Time Series Prediction}},
+  author = {Shen, Lifeng and Kwok, James},
+  year = {2023},
+  eprint = {2306.05043},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2306.05043},
+  url = {https://arxiv.org/abs/2306.05043}
+}
+
+@misc{p22,
+  title = {{Score-based Data Assimilation}},
+  author = {Rozet, François and Louppe, Gilles},
+  year = {2023},
+  eprint = {2306.10574},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2306.10574},
+  url = {https://arxiv.org/abs/2306.10574}
+}
+
+@misc{p23,
+  title = {{Diffusion-based Time Series Imputation and Forecasting with Structured State Space Models}},
+  author = {Alcaraz, Juan Miguel Lopez and Strodthoff, Nils},
+  year = {2022},
+  eprint = {2208.09399},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2208.09399},
+  url = {https://arxiv.org/abs/2208.09399}
+}
+
+@misc{p24,
+  title = {{Predict, Refine, Synthesize: Self-Guiding Diffusion Models for Probabilistic Time Series Forecasting}},
+  author = {Kollovieh, Marcel and Ansari, Abdul Fatir and Bohlke-Schneider, Michael and Zschiegner, Jasper and Wang, Hao and Wang, Yuyang},
+  year = {2023},
+  eprint = {2307.11494},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2307.11494},
+  url = {https://arxiv.org/abs/2307.11494}
+}
+
+@misc{p25,
+  title = {{Restart Sampling for Improving Generative Processes}},
+  author = {Xu, Yilun and Deng, Mingyang and Cheng, Xiang and Tian, Yonglong and Liu, Ziming and Jaakkola, Tommi},
+  year = {2023},
+  eprint = {2306.14878},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2306.14878},
+  url = {https://arxiv.org/abs/2306.14878}
+}
+
+@misc{p26,
+  title = {{Solving Diffusion Inverse Problems with Restart Posterior Sampling}},
+  author = {Ahmed, Bilal and Makin, Joseph G.},
+  year = {2025},
+  eprint = {2511.20705},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2511.20705},
+  url = {https://arxiv.org/abs/2511.20705}
+}
+
+@misc{p27,
+  title = {{RePaint: Inpainting using Denoising Diffusion Probabilistic Models}},
+  author = {Lugmayr, Andreas and Danelljan, Martin and Romero, Andres and Yu, Fisher and Timofte, Radu and Van Gool, Luc},
+  year = {2022},
+  eprint = {2201.09865},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2201.09865},
+  url = {https://arxiv.org/abs/2201.09865}
+}
+
+@misc{p28,
+  title = {{Diffusion Posterior Sampling for General Noisy Inverse Problems}},
+  author = {Chung, Hyungjin and Kim, Jeongsol and Mccann, Michael T. and Klasky, Marc L. and Ye, Jong Chul},
+  year = {2022},
+  eprint = {2209.14687},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2209.14687},
+  url = {https://arxiv.org/abs/2209.14687}
+}
+
+@misc{p29,
+  title = {{Denoising Diffusion Restoration Models}},
+  author = {Kawar, Bahjat and Elad, Michael and Ermon, Stefano and Song, Jiaming},
+  year = {2022},
+  eprint = {2201.11793},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2201.11793},
+  url = {https://arxiv.org/abs/2201.11793}
+}
+
+@misc{p30,
+  title = {{Denoising Diffusion Implicit Models}},
+  author = {Song, Jiaming and Meng, Chenlin and Ermon, Stefano},
+  year = {2020},
+  eprint = {2010.02502},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2010.02502},
+  url = {https://arxiv.org/abs/2010.02502}
+}
+
+@misc{p31,
+  title = {{DPM-Solver: A Fast ODE Solver for Diffusion Probabilistic Model Sampling in Around 10 Steps}},
+  author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
+  year = {2022},
+  eprint = {2206.00927},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2206.00927},
+  url = {https://arxiv.org/abs/2206.00927}
+}
+
+@misc{p32,
+  title = {{DPM-Solver++: Fast Solver for Guided Sampling of Diffusion Probabilistic Models}},
+  author = {Lu, Cheng and Zhou, Yuhao and Bao, Fan and Chen, Jianfei and Li, Chongxuan and Zhu, Jun},
+  year = {2022},
+  eprint = {2211.01095},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2211.01095},
+  url = {https://arxiv.org/abs/2211.01095}
+}
+
+@misc{p33,
+  title = {{UniPC: A Unified Predictor-Corrector Framework for Fast Sampling of Diffusion Models}},
+  author = {Zhao, Wenliang and Bai, Lujia and Rao, Yongming and Zhou, Jie and Lu, Jiwen},
+  year = {2023},
+  eprint = {2302.04867},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2302.04867},
+  url = {https://arxiv.org/abs/2302.04867}
+}
+
+@misc{p34,
+  title = {{Consistency Models}},
+  author = {Song, Yang and Dhariwal, Prafulla and Chen, Mark and Sutskever, Ilya},
+  year = {2023},
+  eprint = {2303.01469},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2303.01469},
+  url = {https://arxiv.org/abs/2303.01469}
+}
+
+@misc{p35,
+  title = {{Progressive Distillation for Fast Sampling of Diffusion Models}},
+  author = {Salimans, Tim and Ho, Jonathan},
+  year = {2022},
+  eprint = {2202.00512},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2202.00512},
+  url = {https://arxiv.org/abs/2202.00512}
+}
+
+@misc{p36,
+  title = {{Elucidating the Design Space of Diffusion-Based Generative Models}},
+  author = {Karras, Tero and Aittala, Miika and Aila, Timo and Laine, Samuli},
+  year = {2022},
+  eprint = {2206.00364},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2206.00364},
+  url = {https://arxiv.org/abs/2206.00364}
+}
+
+@misc{p37,
+  title = {{Denoising Diffusion Probabilistic Models}},
+  author = {Ho, Jonathan and Jain, Ajay and Abbeel, Pieter},
+  year = {2020},
+  eprint = {2006.11239},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2006.11239},
+  url = {https://arxiv.org/abs/2006.11239}
+}
+
+@misc{p38,
+  title = {{Score-Based Generative Modeling through Stochastic Differential Equations}},
+  author = {Song, Yang and Sohl-Dickstein, Jascha and Kingma, Diederik P. and Kumar, Abhishek and Ermon, Stefano and Poole, Ben},
+  year = {2020},
+  eprint = {2011.13456},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2011.13456},
+  url = {https://arxiv.org/abs/2011.13456}
+}
+
+@misc{p39,
+  title = {{Flow Matching for Generative Modeling}},
+  author = {Lipman, Yaron and Chen, Ricky T. Q. and Ben-Hamu, Heli and Nickel, Maximilian and Le, Matt},
+  year = {2022},
+  eprint = {2210.02747},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2210.02747},
+  url = {https://arxiv.org/abs/2210.02747}
+}
+
+@misc{p40,
+  title = {{Classifier-Free Diffusion Guidance}},
+  author = {Ho, Jonathan and Salimans, Tim},
+  year = {2022},
+  eprint = {2207.12598},
+  archivePrefix = {arXiv},
+  doi = {10.48550/arXiv.2207.12598},
+  url = {https://arxiv.org/abs/2207.12598}
+}
+
+\end{filecontents*}
+
 \documentclass{article}
 \PassOptionsToPackage{numbers,sort,compress}{natbib}
 \usepackage[main,final]{neurips_2025}
@@ -58,6 +887,31 @@ Score-based Data Assimilation отделяет модель наблюдений
 
 Рассмотренные работы уже предлагают способы потоковой генерации, повторного использования прогнозов и ускорения сэмплирования. Поэтому я не формулирую задачу как создание первого метода, учитывающего новые наблюдения. Я исследую, как эти способы работают при изменении контекста внутри незавершённой генерации траектории и как их применимость зависит от момента поступления данных, величины изменения прогноза и доступного бюджета. Для сравнения важны и точность, и сохранение неопределённости, и время получения обновления. На основе выявленных ограничений я предложу возможные улучшения; конкретный подход и его отличие от ближайших методов будут определены по результатам дальнейшего анализа и экспериментов.
 
+
+\clearpage
+\section{Предварительные сведения}\label{sec:prelim}
+\subsection{Обозначения}
+Исходный контекст обозначается через $c$, новые наблюдения --- через $\Delta c$, промежуточное состояние генерации на стадии $s$ --- через $z_s$. Через $\mathcal A$ обозначается множество рассматриваемых способов обновления, а через $B$ --- доступный вычислительный бюджет.
+
+\subsection{Предположения}
+Вычислительный бюджет учитывается после поступления новых наблюдений и измеряется числом вызовов диффузионной модели. Способы обновления сравниваются на одинаковых тестовых примерах при одинаковом бюджете.
+
+\subsection{Постановка задачи}\label{sec:problem}
+Данная работа посвящена исследованию способов обновления вероятностного прогноза траекторий при поступлении новых наблюдений во время диффузионной генерации. К этому моменту часть вычислений уже выполнена, однако промежуточное состояние генерации получено с использованием прежнего контекста. Я исследую, в каких условиях эти вычисления можно использовать для получения обновлённого прогноза.
+
+Даны исходный контекст $c$, новые наблюдения $\Delta c$, промежуточное состояние генерации $z_s$ на стадии $s$ и вычислительный бюджет $B$, доступный после поступления наблюдений. Требуется определить способ обновления $A$, который учитывает новый контекст и минимизирует ошибку вероятностного прогноза в пределах заданного бюджета:
+\begin{equation}
+A_B^{*}
+=
+\underset{A\in\mathcal A:\,C(A)\le B}{\arg\min}
+\frac{1}{n}\sum_{i=1}^{n}
+\operatorname{ES}\!\left(\widehat P_{A,i},y_i\right),
+\end{equation}
+где $\mathcal A$ --- рассматриваемые способы обновления, $\widehat P_{A,i}$ --- распределение будущих траекторий, сформированное способом $A$ для тестового примера $i$, $y_i$ --- фактическая будущая траектория, $n$ --- число тестовых примеров. Величина $C(A)$ обозначает число вызовов диффузионной модели после поступления новых наблюдений.
+
+Качество вероятностного прогноза оценивается с помощью Energy Score, который учитывает близость сгенерированных траекторий к фактическому будущему и их разброс. Меньшее значение соответствует лучшему прогнозу. Дополнительно оцениваются ошибки траекторий ADE/FDE и время получения обновлённого результата.
+
+Способы обновления сравниваются на одинаковых тестовых примерах при одинаковом вычислительном бюджете. Сравнение проводится при разных стадиях поступления новых наблюдений, разной степени их влияния на прогноз и разных доступных бюджетах.
 
 \clearpage
 \bibliographystyle{unsrtnat}

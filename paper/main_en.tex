@@ -59,6 +59,31 @@ Re-noising is also an existing tool. RePaint uses resampling for image reconstru
 The reviewed studies already offer streaming generation, forecast reuse, and accelerated sampling. I therefore do not frame the problem as creating the first method that incorporates new observations. I investigate how these strategies behave when context changes within unfinished trajectory generation and how their applicability depends on observation arrival time, the extent of forecast change, and the available budget. The comparison must consider accuracy, uncertainty preservation, and update latency. Based on identified limitations, I will propose possible improvements; the particular approach and its distinction from the closest methods will be determined through further analysis and experiments.
 
 \clearpage
+\section{Preliminaries}\label{sec:prelim}
+\subsection{General notation}
+The initial context is denoted by $c$, new observations by $\Delta c$, and the intermediate generation state at stage $s$ by $z_s$. The set of update strategies under consideration is denoted by $\mathcal A$, and the available computational budget by $B$.
+
+\subsection{Assumptions}
+The computational budget is counted after new observations arrive and measured by the number of diffusion model evaluations. Update strategies are compared on the same test examples under the same budget.
+
+\subsection{Problem formulation}\label{sec:problem}
+This work investigates strategies for updating probabilistic trajectory forecasts when new observations arrive during diffusion generation. At this point, part of the computation has already been performed, but the intermediate generation state was obtained using the previous context. I investigate the conditions under which this computation can be reused to produce an updated forecast.
+
+Given the initial context $c$, new observations $\Delta c$, the intermediate generation state $z_s$ at stage $s$, and a computational budget $B$ available after the observations arrive, the objective is to determine an update strategy $A$ that incorporates the new context and minimizes probabilistic forecast error within the specified budget:
+\begin{equation}
+A_B^{*}
+=
+\underset{A\in\mathcal A:\,C(A)\le B}{\arg\min}
+\frac{1}{n}\sum_{i=1}^{n}
+\operatorname{ES}\!\left(\widehat P_{A,i},y_i\right),
+\end{equation}
+where $\mathcal A$ is the set of update strategies under consideration, $\widehat P_{A,i}$ is the distribution of future trajectories produced by strategy $A$ for test example $i$, $y_i$ is the observed future trajectory, and $n$ is the number of test examples. The quantity $C(A)$ denotes the number of diffusion model evaluations after new observations arrive.
+
+Probabilistic forecast quality is assessed using the Energy Score, which accounts for both the proximity of generated trajectories to the observed future and their dispersion. Lower values indicate better forecasts. Trajectory errors ADE/FDE and the time required to obtain an updated result are also evaluated.
+
+Update strategies are compared on the same test examples under the same computational budget. The comparison considers observations arriving at different generation stages, different degrees of influence on the forecast, and different available budgets.
+
+\clearpage
 \bibliographystyle{unsrtnat}
 \bibliography{references}
 \end{document}
