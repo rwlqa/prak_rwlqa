@@ -7,3 +7,12 @@
 /paper/*.blg
 /paper/*.out
 /paper/*.synctex.gz
+
+/.venv/
+/data/
+/artifacts/
+/results/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/

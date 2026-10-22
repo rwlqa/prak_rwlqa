@@ -4,6 +4,8 @@
 
 ## Materials
 
+- [Implementation and experiment protocol (Russian)](EXPERIMENTS.md)
+- [Model and comparison configuration](configs/default.json)
 - [Abstract](ANNOTATION.en.md)
 - [Related work](RELATED_WORK.en.md)
 - [Review of 40 sources](LINKREVIEW.en.md)
@@ -19,7 +21,7 @@ This work investigates ways to adapt diffusion models for trajectory generation 
 
 ## Research status
 
-The study is at the literature review and problem refinement stage. No particular method has yet been selected, and no experimental results are claimed. The focus is on new observations arriving while a trajectory forecast is being computed. Author and advisor details will be added after confirmation.
+A conditional trajectory diffusion model, an MLP selecting the re-noising depth, and a comparison protocol are implemented. Architecture, data preparation, and CLI commands are documented in [EXPERIMENTS.md](EXPERIMENTS.md). The focus is on new observations arriving while a trajectory forecast is being computed. Author and advisor details will be added after confirmation.
 
 ## Building the PDFs
 

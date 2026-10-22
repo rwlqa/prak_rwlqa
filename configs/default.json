@@ -1,0 +1,15 @@
+{
+  "seed": 42,
+  "device": "cpu",
+  "model": {"obs_len": 8, "pred_len": 12, "hidden": 64, "layers": 2},
+  "training": {"epochs": 100, "batch_size": 64, "lr": 0.0003, "switch_weight": 0.1},
+  "selector": {"epochs": 80, "batch_size": 128, "lr": 0.001},
+  "experiment": {
+    "samples": 16,
+    "prefix_steps": 32,
+    "arrival_fractions": [0.25, 0.5, 0.75, 0.9],
+    "budgets": [2, 4, 8, 16],
+    "seeds": [11, 23, 37],
+    "methods": ["continue", "fixed25", "fixed50", "fixed75", "restart", "fixed", "adaptive", "l2", "cosine", "probe"]
+  }
+}

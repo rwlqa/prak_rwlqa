@@ -1,0 +1,9 @@
+{
+  "sequences": [
+    {"file": "eth.txt", "scene": "eth", "split": "test"},
+    {"file": "hotel.txt", "scene": "hotel", "split": "val"},
+    {"file": "univ.txt", "scene": "univ", "split": "train"},
+    {"file": "zara1.txt", "scene": "zara1", "split": "train"},
+    {"file": "zara2.txt", "scene": "zara2", "split": "train"}
+  ]
+}
